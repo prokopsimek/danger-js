@@ -3,6 +3,7 @@
 import { GitDSL, GitJSONDSL } from "../dsl/GitDSL"
 import { GitHubDSL } from "../dsl/GitHubDSL"
 import { BitBucketServerDSL, BitBucketServerJSONDSL } from "../dsl/BitBucketServerDSL"
+import { GitlabDSL, GitlabJSONDSL } from "../dsl/GitlabDSL"
 import { DangerUtilsDSL } from "./DangerUtilsDSL"
 import { CliArgs } from "../dsl/cli-args"
 
@@ -57,6 +58,8 @@ export interface DangerDSLJSONType {
   github?: GitHubDSL
   /** The data only version of BitBucket Server DSL */
   bitbucket_server?: BitBucketServerJSONDSL
+  /** The data only version of Gitlab DSL */
+  gitlab?: GitlabJSONDSL
   /**
    * Used in the Danger JSON DSL to pass metadata between
    * processes. It will be undefined when used inside the Danger DSL
@@ -126,6 +129,17 @@ export interface DangerDSLType {
   readonly bitbucket_server: BitBucketServerDSL
 
   /**
+   *  The Gitlab metadata. This covers things like PR info,
+   *  comments and reviews on the PR, related issues, commits, comments
+   *  and activities.
+   *
+   *  Strictly speaking, `gitlab` is a nullable type, if you are using
+   *  GitHub then it will be undefined. For the DSL convenience sake though, it
+   *  is classed as non-nullable
+   */
+  readonly gitlab: GitlabDSL
+
+  /**
    * Functions which are globally useful in most Dangerfiles. Right
    * now, these functions are around making sentences of arrays, or
    * for making a like of href links easily.
@@ -138,6 +152,7 @@ export interface DangerDSLType {
 export class DangerDSL {
   public readonly github?: GitHubDSL
   public readonly bitbucket_server?: BitBucketServerDSL
+  public readonly gitlab?: GitlabDSL
 
   constructor(platformDSL: any, public readonly git: GitJSONDSL, public readonly utils: DangerUtilsDSL, name: string) {
     switch (name) {
@@ -146,6 +161,8 @@ export class DangerDSL {
         this.github = platformDSL
       case "BitBucketServer":
         this.bitbucket_server = platformDSL
+      case "Gitlab":
+        this.gitlab = platformDSL
     }
   }
 }
