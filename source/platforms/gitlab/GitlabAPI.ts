@@ -122,7 +122,8 @@ export class GitlabAPI {
   }
 
   getIssues = async (): Promise<JIRAIssue[]> => {
-    const path = `${this.getPRBasePath("jira")}/issues`
+    // const path = `${this.getPRBasePath("jira")}/issues`
+    const path = `issues`
     const res = await this.get(path)
     throwIfNotOk(res)
     return await res.json()

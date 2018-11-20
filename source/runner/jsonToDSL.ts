@@ -27,6 +27,7 @@ export const jsonToDSL = async (dsl: DangerDSLJSONType, source: CISource): Promi
   const platformExists = [dsl.github, dsl.bitbucket_server].some(p => !!p)
   const github = dsl.github && githubJSONToGitHubDSL(dsl.github, api as OctoKit)
   const bitbucket_server = dsl.bitbucket_server
+  const gitlab = dsl.gitlab
 
   let git: GitDSL
   if (!platformExists) {
@@ -45,6 +46,7 @@ export const jsonToDSL = async (dsl: DangerDSLJSONType, source: CISource): Promi
     // which just doesn't feel right.
     github: github!,
     bitbucket_server: bitbucket_server!,
+    gitlab: gitlab!,
     utils: {
       sentence,
       href,

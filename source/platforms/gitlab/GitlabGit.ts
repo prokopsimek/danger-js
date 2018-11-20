@@ -1,28 +1,22 @@
 import { GitDSL, GitJSONDSL } from "../../dsl/GitDSL"
-import {
-  BitBucketServerCommit,
-  BitBucketServerDSL,
-  BitBucketServerDiff,
-  RepoMetaData,
-  BitBucketServerChangesValue,
-} from "../../dsl/BitBucketServerDSL"
+import { GitlabCommit, GitlabDSL, GitlabDiff, RepoMetaData, GitlabChangesValue } from "../../dsl/GitlabDSL"
 import { GitCommit } from "../../dsl/Commit"
 
-import { BitBucketServerAPI } from "../bitbucket_server/BitBucketServerAPI"
+import { GitlabAPI } from "../gitlab/GitlabAPI"
 
 import { GitJSONToGitDSLConfig, gitJSONToGitDSL, GitStructuredDiff } from "../git/gitJSONToGitDSL"
 
 import { debug } from "../../debug"
-const d = debug("BitBucketServerGit")
+const d = debug("GitlabGit")
 
 /**
  * Returns the response for the new comment
  *
- * @param {BitBucketServerCommit} ghCommit A BitBucketServer based commit
+ * @param {GitlabCommit} ghCommit A Gitlab based commit
  * @returns {GitCommit} a Git commit representation without GH metadata
  */
 function bitBucketServerCommitToGitCommit(
-  bbsCommit: BitBucketServerCommit,
+  bbsCommit: GitlabCommit,
   repoMetadata: RepoMetaData,
   host: string
 ): GitCommit {
@@ -52,7 +46,7 @@ function bitBucketServerCommitToGitCommit(
   }
 }
 
-export default async function gitDSLForBitBucketServer(api: BitBucketServerAPI): Promise<GitJSONDSL> {
+export default async function gitDSLForGitlab(api: GitlabAPI): Promise<GitJSONDSL> {
   // We'll need all this info to be able to generate a working GitDSL object
   const changes = await api.getPullRequestChanges()
   const gitCommits = await api.getPullRequestCommits()
@@ -63,9 +57,9 @@ export default async function gitDSLForBitBucketServer(api: BitBucketServerAPI):
 }
 
 export const bitBucketServerGitDSL = (
-  bitBucketServer: BitBucketServerDSL,
+  bitBucketServer: GitlabDSL,
   json: GitJSONDSL,
-  bitBucketServerAPI: BitBucketServerAPI
+  bitBucketServerAPI: GitlabAPI
 ): GitDSL => {
   const config: GitJSONToGitDSLConfig = {
     repo:
@@ -84,10 +78,7 @@ export const bitBucketServerGitDSL = (
   return gitJSONToGitDSL(json, config)
 }
 
-const bitBucketServerChangesToGitJSONDSL = (
-  changes: BitBucketServerChangesValue[],
-  commits: GitCommit[]
-): GitJSONDSL => {
+const bitBucketServerChangesToGitJSONDSL = (changes: GitlabChangesValue[], commits: GitCommit[]): GitJSONDSL => {
   return changes.reduce<GitJSONDSL>(
     (git, value) => {
       switch (value.type) {
@@ -125,7 +116,7 @@ const bitBucketServerChangesToGitJSONDSL = (
   )
 }
 
-const bitBucketServerDiffToGitStructuredDiff = (diffs: BitBucketServerDiff[]): GitStructuredDiff => {
+const bitBucketServerDiffToGitStructuredDiff = (diffs: GitlabDiff[]): GitStructuredDiff => {
   // We need all changed lines with it's type. It will convert hunk segment lines to flatten changed lines.
   const segmentValues = { ADDED: "add", CONTEXT: "normal", REMOVED: "del" }
   return diffs.map(diff => ({

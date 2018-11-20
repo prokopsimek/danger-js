@@ -34,14 +34,14 @@ export class GitlabActions implements CISource {
     //   merge_request.nil? ? 0 : merge_request.iid
     if (this.env.CI_MERGE_REQUEST_ID) {
       return this.env.CI_MERGE_REQUEST_ID
-    } else if (this.env.CI_COMMIT_SHA) {
+    } else if (!this.env.CI_COMMIT_SHA) {
       return "0"
     }
 
-    const projectPath: string = this.env.CI_PROJECT_PATH
-    const baseCommit: string = this.env.CI_COMMIT_SHA
-    const client: null = null
-    const mergeRequests: MergeRequest[] = []
+    // const projectPath: string = this.env.CI_PROJECT_PATH
+    // const baseCommit: string = this.env.CI_COMMIT_SHA
+    // const client: null = null
+    // const mergeRequests: MergeRequest[] = []
     const mergeRequest: MergeRequest = { iid: "1" }
 
     return (mergeRequest === null ? "0" : mergeRequest.iid).toString()
